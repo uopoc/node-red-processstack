@@ -4,9 +4,9 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         this.name = config.name;
         this.group = config.group;
-        this.order = config.order;
         this.width = config.width;
         this.height = config.height;
+        this.order = config.order;
 
         const html = String.raw`
 <style>
@@ -61,9 +61,9 @@ module.exports = function(RED) {
             <tr ng-repeat="item in msg.payload">
                 <td>{{$index + 1}}</td>
                 <td>
-                    <span class="tag" title="Item first created on {{item._created | date:'yyyy-MM-dd HH:mm:ss'}}&#10;Updated on {{item._updated | date:'yyyy-MM-dd HH:mm:ss'}}">
-                        {{item.id}}
-                    </span>
+					<span class="tag" title="Item first created on {{item._created | date:'yyyy-MM-dd HH:mm:ss'}}&#10;Updated on {{item._updated | date:'yyyy-MM-dd HH:mm:ss'}}&#10;&#10;HISTORY:&#10;{{item._historyStr}}">
+						{{item.id}}
+					</span>
                 </td>
                 <td>
                     <div ng-if="item.userdata && (item.userdata | json) !== '{}'">
@@ -85,8 +85,8 @@ module.exports = function(RED) {
 
         const done = ui.addWidget({
             node: this,
-            order: config.order,
             group: config.group,
+            order: config.order,
             width: config.width,
             height: config.height,
             format: html,
@@ -96,7 +96,19 @@ module.exports = function(RED) {
             storeFrontEndInputAsState: false,
 			convertBack: value => value,
 			beforeEmit: function(msg) {
-				return { msg }; 
+				if (Array.isArray(msg.payload)) {
+					msg.payload.forEach(item => {
+						if (Array.isArray(item._history)) {
+							item._historyStr = item._history.map(h => {
+								const toDate = new Date(h.date_to || 0).toISOString().replace('T', ' ').substring(0, 19);
+								return `${toDate}:  ${h.path_from || 'N/A'} ➔ ${h.path_to || 'N/A'}`;
+							}).join('\n');
+						} else {
+							item._historyStr = '';
+						}
+					});
+				}
+				return { msg };
 			}
         });
 

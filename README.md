@@ -1,13 +1,27 @@
 # 🧱 Virtual Process Flow Stack for Node-RED
 ## Description
 
-Manage persistent FIFO stacks for industrial process flows using Node-RED. \
+Manage persistent FIFO queues for industrial process flows using Node-RED. \
 With full MQTT support, file persistence, and dashboard integration.\
-WARNING : Minimum Node-RED Version 4+
+
+WARNING : Minimum Node-RED Version 4+ \
+
+** For pedagogical purposes only. Commercial or industrial use is not recommended. **
+
+NPM Repository: [npmjs @uopoc/node-red-processstack] (https://www.npmjs.com/package/@uopoc/node-red-processstack/)
+GIT Repository: [github @uopoc/node-red-processstack] (https://github.com/uopoc/node-red-processstack)
+RED Node: [Node-Red @uopoc/node-red-processstack] (https://flows.nodered.org/node/@uopoc/node-red-processstack)
+
+
+** WARNING ** : 
+* Minimum Node-RED Version 4+
+* Minimum NodeJS Version 18+
+
 
 
 Copyright © 2025, [Université d'Orléans](https://www.univ-orleans.fr)\
-Licence MIT
+Licence MIT - see [LICENCE](./LICENCE) file included with this package \
+
 
 
 ## 🧰 Main Features
@@ -49,10 +63,14 @@ Each stack is **automatically saved to disk** after every modification:\
 npm install @uopoc/node-red-processstack
 ```
 
+## ChangeLog
+[Voir le changelog](./CHANGELOG.md)
+
 ## Nodes details
 ### PUSH Node
 Add (push) an item to the FIFO Stack
-* **Input**:\ Object with :
+* **Input**:
+ Object with :
 	- id Required, string or number (max 128 chars). Allowed characters: a-z, A-Z, 0-9, _, -, 
 	- userdata : Required, must be an object with any metadata you want to store (can be empty object)
 **Rm**: msg.payload can also be an item provided by the pull node\
@@ -61,7 +79,8 @@ Add (push) an item to the FIFO Stack
 	  "id": "ITEM-001",\
 	  "userdata": { "batch": "B001", "weight": 2.5 }\
 	} 
-* **Output**: \ Object with :
+* **Output**: 
+Object with :
 	msg.payload = true/false\
 	msg.item = {\
 		  _itemid: uniqueid (UID),\

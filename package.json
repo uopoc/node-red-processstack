@@ -1,13 +1,13 @@
 {
 	"name": "@uopoc/node-red-processstack",
-	"version": "1.0.27",
+	"version": "1.0.28",
 	"description": "Persistent FIFO stack for industrial process flows for Node-RED 4",
-	"homepage": "https://www.npmjs.com/package/@uopoc/node-red-processstack?activeTab=readme",
+	"homepage": "https://www.npmjs.com/package/@uopoc/node-red-processstack",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [
-		"node-red", "processstack", "stack", "FIFO"
+		"node-red", "processstack", "stack", "FIFO", "polyfactory"
 	],
 	"author": "JR",
 	"license": "MIT",

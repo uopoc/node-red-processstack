@@ -5,15 +5,28 @@
         defaults: {
             name: { value: '' },
             group: { type: 'ui_group', required: true },
-            order: { value: 0 },
-            width: { value: 100 },
-            height: { value: 100 }
+            width: { value: 6 },
+            height: { value: 0 },
+            order: { value: 0 }
         },
         inputs: 1,
         outputs: 0,
         icon: "font-awesome/fa-table",
         label: function () {
             return this.name || "PST Table";
+        },
+        oneditprepare: function () {
+			/*
+			console.log(RED.dashboard);
+            if (RED.dashboard && RED.dashboard.editSize && typeof RED.dashboard.editSize === 'function') {
+                RED.dashboard.editSize($('#size-editor'), {
+                    width: '#node-input-width',
+                    height: '#node-input-height',
+                    group: '#node-input-group'
+                });
+            } else {
+                console.warn("RED.dashboard.editSize is not available. Make sure node-red-dashboard is installed and up to date.");
+            }*/
         }
     });
 </script>
@@ -27,10 +40,14 @@
         <label for="node-input-group"><i class="fa fa-object-group"></i> Group</label>
         <select id="node-input-group"></select>
     </div>
+	<!--
     <div class="form-row">
-        <label for="node-input-order"><i class="fa fa-sort"></i> Order</label>
-        <input type="number" id="node-input-order">
+        <label><i class="fa fa-arrows"></i> Size</label>
+        <input type="hidden" id="node-input-width">
+        <input type="hidden" id="node-input-height">
+        <button class="editor-button" id="size-editor">Edit Size</button>
     </div>
+	-->
     <div class="form-row">
         <label for="node-input-width"><i class="fa fa-arrows-h"></i> Width</label>
         <input type="number" id="node-input-width">

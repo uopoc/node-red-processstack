@@ -770,7 +770,7 @@ module.exports = function(RED) {
 			date_from:item._updated||null, 
 			date_to:ts, 
 			age:(ts-(item._created||ts)),
-			duration:(ts(item._updated||ts)),
+			duration:(ts-(item._updated||ts)),
 			path_from:item._path||null, 
 			path_to:path
 		};

@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-nothing
+- Tooltip in ui-pst-table on each row includes full _history with path movements.
 
 ### Removed
 
@@ -34,6 +34,7 @@ nothing
 - ui-pst-table node: custom dashboard widget with styled HTML table for stack visualization
 - Display enhancements: tooltip on hover with creation/modification dates.
 - autoUpdate flag in pst-supervisor to optionally emit updates at each event.
+
 
 ### Fixed
 
