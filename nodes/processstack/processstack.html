@@ -1,0 +1,440 @@
+<script type="text/javascript">
+    RED.nodes.registerType('pst-push',{
+        category: 'Process Stack',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            stack: {value:"", type:"pst-stack", required:true},
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "icons/stackin.svg",
+        label: function() {
+            //return this.name||("Push - "+(this.stack.manufacturingcell.processflow.name||"")+"/"+(this.stack.manufacturingcell.name||"")+"/"+(this.stack.name||''));
+            return this.name||("Push");
+			//return "toto";
+        }
+    });
+    RED.nodes.registerType('pst-shift',{
+        category: 'Process Stack',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            stack: {value:"", type:"pst-stack", required:true},
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "icons/stackout.svg",
+        label: function() {
+            return this.name||("Shift");
+        }
+    });
+    RED.nodes.registerType('pst-clearstack',{
+        category: 'Process Stack',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            stack: {value:"", type:"pst-stack", required:true},
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "icons/stacktrash.svg",
+        label: function() {
+            return this.name||("Clear");
+        }
+    });
+    RED.nodes.registerType('pst-peek',{
+        category: 'Process Stack',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            stack: {value:"", type:"pst-stack", required:true},
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "icons/stackout.svg",
+        label: function() {
+            return this.name||("Peek Item");
+        }
+    });
+    RED.nodes.registerType('pst-supervisor',{
+        category: 'Process Stack',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            stack: {value:"", type:"pst-stack", required:true},
+            autoUpdate: {value:false},
+            useMQTT: {value:false}
+        },
+        inputs: 1,
+        outputs: 2,
+        icon: "icons/stacksv.svg",
+        label: function() {
+            return this.name||("Supervisor");
+        },
+		oneditprepare: function () {
+			$("#node-input-autoUpdate").prop("checked", this.autoUpdate || false);
+		},
+		oneditsave: function () {
+			this.autoUpdate = $("#node-input-autoUpdate").prop("checked");
+		}
+    });
+    RED.nodes.registerType('pst-transfert',{
+        category: 'Process Stack',
+        color: '#a6bbcf',
+        defaults: {
+            name: 		{value:""},
+            stackin: 	{value:"", type:"pst-stack", required:true},
+            stackout: 	{value:"", type:"pst-stack", required:true},
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "icons/stacktransfert.svg",
+        label: function() {
+            return this.name||("Transfert");
+        }
+    });
+	
+	
+	
+	// CONFIG NODES
+    RED.nodes.registerType('pst-processflow',{
+        category: 'config',
+        defaults: {
+			name: {value:"process"},
+			processid: {value:"", required:true},
+			company: {value:""},
+			department: {value:""},
+			location: {value:""},
+        },
+        label: function() {
+            return this.name||"process flow";
+        }
+    });
+	
+    RED.nodes.registerType('pst-manufacturingcell',{
+        category: 'config',
+        defaults: {
+			name: {value:"cell"},
+			cellid: {value:"", required:true},
+            processflow: {value:"", type:"pst-processflow", required:true},
+			manufacturer: {value:""},
+			model: {value:""},
+        },
+        label: function() {
+            return this.name||"manufacturing cell";
+        }
+    });
+	
+    RED.nodes.registerType('pst-stack',{
+        category: 'config',
+        defaults: {
+			name: {value:"stack"},
+			stackid: {value:"", required:true},
+			maxitem: {value:"100", required:false, validate:RED.validators.number()},
+            manufacturingcell: {value:"", type:"pst-manufacturingcell", required:true},
+            mqttClient: { type: "mqtt-broker", required: false },
+            mqttTopicEvent: { value: "", required: false },
+            mqttTopicSuperv: { value: "", required: false },
+            mqttTopicCommand: { value: "", required: false },
+        },
+        label: function() {
+            return this.name || this.stackid || "stack";
+        }
+    });
+</script>
+
+
+<!-- ############### push Node ################## -->
+<script type="text/html" data-template-name="pst-push">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-stack"><i class="fa fa-database"></i> Stack</label>
+        <select id="node-input-stack" ></select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="pst-push">
+    <p>Add (push) an item to the FIFO Stack</p>
+	
+	<h3>Input <span style="font-weight: normal;">(msg.payload)</span></h3>
+	<p><strong>msg.payload</strong> :</p>
+	<p>
+	  {
+	  "id": "ITEM-001",<br>
+	  "userdata": { "batch": "B001", "weight": 2.5 }
+	  }
+	</p>
+
+	<ul>
+	  <li><strong>id</strong> — <em>Required</em>. String or number (max 128 characters). Allowed characters: a-z, A-Z, 0-9, _, -, /</li>
+	  <li><strong>userdata</strong> — <em>Required</em>. Must be an object (can be empty). Any metadata you want to store.</li>
+	  <li><strong>Note:</strong> <em>msg.payload</em> can also be an item received from the <strong>pull</strong> node.</li>
+	</ul>
+
+	<h3>Output</h3>
+	<p><strong>msg.payload</strong> = true / false</p>
+
+	<p><strong>msg.item</strong> :</p>
+	<ul>
+	  <li><strong>_itemid</strong> — Unique identifier (UUID)</li>
+	  <li><strong>_created</strong> — Creation timestamp (milliseconds since 1970)</li>
+	  <li><strong>_updated</strong> — Last update timestamp</li>
+	  <li><strong>id</strong> — The ID provided in the input</li>
+	  <li><strong>userdata</strong> — The metadata provided in the input</li>
+	</ul>
+
+	<p><strong>msg.error</strong> :</p>
+	<ul>
+	  <li><strong>code</strong> — Numeric code</li>
+	  <li><strong>string</strong> — Description of the error or "ok"</li>
+	</ul>
+
+	<p><strong>msg.stackdata</strong> :</p>
+	<ul>
+	  <li>processid</li>
+	  <li>processname</li>
+	  <li>company</li>
+	  <li>department</li>
+	  <li>location</li>
+	  <li>cellid</li>
+	  <li>cellname</li>
+	  <li>manufacturer</li>
+	  <li>model</li>
+	  <li>stackid</li>
+	  <li>stackname</li>
+	</ul>
+</script>
+
+
+
+
+<!-- ############### shift Node ################## -->
+<script type="text/html" data-template-name="pst-shift">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-stack"><i class="fa fa-database"></i> Stack</label>
+        <select id="node-input-stack" ></select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="pst-shift">
+    <p>Remove (shift) an item from the FIFO Stack</p>
+	<ul>
+		<li><b>input</b>: Dummy message to triger the node</li>
+		<li><b>output</b>: (same as msg.item provided by the output of push node, see below)</li>
+	</ul>
+	
+	<h3>Output</h3>
+	<p><strong>msg.payload</strong> = </p>
+	<ul>
+	  <li><strong>_itemid</strong> — Unique identifier (UUID)</li>
+	  <li><strong>_created</strong> — Creation timestamp (milliseconds since 1970)</li>
+	  <li><strong>_updated</strong> — Last update timestamp</li>
+	  <li><strong>id</strong> — The ID provided</li>
+	  <li><strong>userdata</strong> — The metadata provided </li>
+	</ul>
+	
+</script>
+
+
+
+
+<!-- ############### clear Node ################## -->
+<script type="text/html" data-template-name="pst-clearstack">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-stack"><i class="fa fa-database"></i> Stack</label>
+        <select id="node-input-stack" ></select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="pst-clearstack">
+    <p>delete all items from the FIFO Stack</p>
+</script>
+
+
+
+
+<!-- ############### supervisor Node ################## -->
+<script type="text/html" data-template-name="pst-supervisor">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-stack"><i class="fa fa-database"></i> Stack</label>
+        <select id="node-input-stack" ></select>
+    </div>
+	<div class="form-row">
+		<label for="node-input-autoUpdate"><i class="fa fa-refresh"></i> Automatic output on events</label>
+		<input type="checkbox" id="node-input-autoUpdate" style="width:auto;">
+	</div>
+</script>
+
+<script type="text/html" data-help-name="pst-supervisor">
+    <p>get items list from the FIFO Stack</p>
+</script>
+
+<!-- ############### peek Node ################## -->
+<script type="text/html" data-template-name="pst-peek">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-stack"><i class="fa fa-database"></i> Stack</label>
+        <select id="node-input-stack" ></select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="pst-peek">
+    <p>similar to shift, this node get (but not remove) next available item from the FIFO Stack</p>
+</script>
+
+
+<!-- ############### transfert Node ################## -->
+<script type="text/html" data-template-name="pst-transfert">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-stackin"><i class="fa fa-database"></i> Stack In</label>
+        <select id="node-input-stackin" ></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-stackout"><i class="fa fa-database"></i> Stack Out</label>
+        <select id="node-input-stackout" ></select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="pst-transfert">
+    <p>pull items from a FIFO Stack and push in to another stack</p>
+</script>
+
+
+
+
+
+<!-- ############### processflow Configuration Node ################## -->
+<script type="text/html" data-template-name="pst-processflow">
+	<fieldset>
+		<legend>Manufacturing Cell Config</legend>
+		<div class="form-row">
+			<label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+			<input type="text" id="node-config-input-name" />
+		</div>
+		<div class="form-row">
+			<label for="node-config-input-processid"><i class="fa fa-bookmark"></i> Id</label>
+			<input type="text" id="node-config-input-processid" />
+		</div>			
+	</fieldset>
+	<fieldset>
+		<legend>User-Data</legend>
+		</fieldset>
+		<div class="form-row">
+			<label for="node-config-input-company"><i class="fa fa-bookmark"></i> Company</label>
+			<input type="text" id="node-config-input-company" />
+		</div>
+		<div class="form-row">
+			<label for="node-config-input-department"><i class="fa fa-bookmark"></i> Department</label>
+			<input type="text" id="node-config-input-department" />
+		</div>
+		<div class="form-row">
+			<label for="node-config-input-location"><i class="fa fa-bookmark"></i> Location</label>
+			<input type="text" id="node-config-input-location" />
+		</div>	
+	</fieldset>
+</script>
+
+
+
+<!-- ############### manufacturingcell Configuration Node ################## -->
+<script type="text/html" data-template-name="pst-manufacturingcell">
+	<fieldset>
+		<legend>Manufacturing Cell Config</legend>
+		<div class="form-row">
+			<label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+			<input type="text" id="node-config-input-name" />
+		</div>
+		<div class="form-row">
+			<label for="node-config-input-cellid"><i class="fa fa-bookmark"></i> Id</label>
+			<input type="text" id="node-config-input-cellid" />
+		</div>
+		<div class="form-row">
+			<label for="node-config-input-processflow"><i class="fa fa-industry"></i> Process Flow</label>
+			<select id="node-config-input-processflow"></select>
+		</div>
+	</fieldset>
+	<fieldset>
+		<legend>User-Data</legend>
+		<div class="form-row">
+			<label for="node-config-input-manufacturer"><i class="fa fa-bookmark"></i> Manufacturer</label>
+			<input type="text" id="node-config-input-manufacturer" />
+		</div>
+		<div class="form-row">
+			<label for="node-config-input-model"><i class="fa fa-bookmark"></i> Model</label>
+			<input type="text" id="node-config-input-model" />
+		</div>
+	</fieldset>
+</script>
+
+
+
+<!-- ############### stack Configuration Node ################## -->
+<script type="text/html" data-template-name="pst-stack">
+	<fieldset>
+		<legend>Stack Config</legend>
+		<div class="form-row">
+			<label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+			<input type="text" id="node-config-input-name" />
+		</div>
+		<div class="form-row">
+			<label for="node-config-input-stackid"><i class="fa fa-bookmark"></i> Id</label>
+			<input type="text" id="node-config-input-stackid" />
+		</div>
+		<div class="form-row">
+			<label for="node-config-input-maxitem"><i class="fa fa-bookmark"></i> Max quantity</label>
+			<input type="text" id="node-config-input-maxitem" placeholder="100" />
+		</div>
+		<div class="form-row">
+			<label for="node-config-input-manufacturingcell"><i class="fa fa-bookmark"></i> Cell</label>
+			<select id="node-config-input-manufacturingcell" ></select>
+		</div>
+	</fieldset>
+	<fieldset>
+		<legend>MQTT Communication</legend>
+		<!-- MQTT CLIENT SELECTION -->
+		<div class="form-row">
+			<label for="node-config-input-mqttClient"><i class="fa fa-server"></i> MQTT Broker</label>
+			<input type="text" id="node-config-input-mqttClient">
+		</div>
+
+		<!-- MQTT TOPIC -->
+		<div class="form-row">
+			<label for="node-config-input-mqttTopicEvent"><i class="fa fa-comment"></i> Event Topic</label>
+			<input type="text" id="node-config-input-mqttTopicEvent" placeholder="ex: factory/stack/event">
+		</div>
+		<div class="form-row">
+			<label for="node-config-input-mqttTopicSuperv"><i class="fa fa-comment"></i> Supervisory Topic</label>
+			<input type="text" id="node-config-input-mqttTopicSuperv" placeholder="ex: factory/stack/supervisory">
+		</div>
+		<div class="form-row">
+			<label for="node-config-input-mqttTopicCommand"><i class="fa fa-comment"></i> Command Topic</label>
+			<input type="text" id="node-config-input-mqttTopicCommand" placeholder="ex: factory/stack/command">
+		</div>
+	</fieldset>
+	<fieldset>
+		<legend>User-Data</legend>
+	</fieldset>
+</script>
