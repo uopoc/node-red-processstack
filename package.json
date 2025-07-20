@@ -1,6 +1,6 @@
 {
 	"name": "@uopoc/node-red-processstack",
-	"version": "1.0.28",
+	"version": "1.0.30",
 	"description": "Persistent FIFO stack for industrial process flows for Node-RED 4",
 	"homepage": "https://www.npmjs.com/package/@uopoc/node-red-processstack",
 	"scripts": {
@@ -18,7 +18,8 @@
 		"version": ">=4.0.0",
 		"nodes": {
 			"processstack": "nodes/processstack/processstack.js",
-			"ui-pst-table": "nodes/ui-pst-table/ui-pst-table.js"
+			"ui-pst-table": "nodes/ui-pst-table/ui-pst-table.js",
+			"ui-pst-queue": "nodes/ui-pst-queue/ui-pst-queue.js"
         }
 	},
 	"bugs": {

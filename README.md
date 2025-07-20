@@ -2,33 +2,32 @@
 ## Description
 
 Manage persistent FIFO queues for industrial process flows using Node-RED. \
-With full MQTT support, file persistence, and dashboard integration.\
-
-WARNING : Minimum Node-RED Version 4+ \
+With full MQTT support, file persistence, and dashboard integration.
 
 ** For pedagogical purposes only. Commercial or industrial use is not recommended. **
 
-NPM Repository: [npmjs @uopoc/node-red-processstack] (https://www.npmjs.com/package/@uopoc/node-red-processstack/)
-GIT Repository: [github @uopoc/node-red-processstack] (https://github.com/uopoc/node-red-processstack)
-RED Node: [Node-Red @uopoc/node-red-processstack] (https://flows.nodered.org/node/@uopoc/node-red-processstack)
+* NPM Repository: [npmjs @uopoc/node-red-processstack](https://www.npmjs.com/package/@uopoc/node-red-processstack/)
+* GIT Repository: [github @uopoc/node-red-processstack](https://github.com/uopoc/node-red-processstack)
+* RED Node: [Node-Red @uopoc/node-red-processstack](https://flows.nodered.org/node/@uopoc/node-red-processstack)
 
 
 ** WARNING ** : 
-* Minimum Node-RED Version 4+
-* Minimum NodeJS Version 18+
+* Minimum Node-RED Version 4.0.0+
+* Minimum NodeJS Version 18.0.0+
+* Minimum node-red-dashboard Version 3.6.0+
 
 
 
 Copyright © 2025, [Université d'Orléans](https://www.univ-orleans.fr)\
-Licence MIT - see [LICENCE](./LICENCE) file included with this package \
+Licensed under the MIT License – See [LICENCE](./LICENCE) file included with this package 
 
 
 
 ## 🧰 Main Features
-- **Persistent FIFO** (First-In First-Out) stacks
+- **Persistent FIFO** (First-In First-Out) queues (stacks)
 - **MQTT commands & events** Optional
 - **dashboard UI** ready using a specific node
-- Structured by **Process / Cell / Stack**
+- Structured by **Process / Cell / Queue**
 
 
 

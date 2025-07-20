@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Track history in each item
 - Changelog added
+- ui-Dasboard Widget with graphical display of queues
 
 ### Fixed
 
