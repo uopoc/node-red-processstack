@@ -1,6 +1,6 @@
 {
 	"name": "@uopoc/node-red-processstack",
-	"version": "1.0.30",
+	"version": "1.0.31",
 	"description": "Persistent FIFO stack for industrial process flows for Node-RED 4",
 	"homepage": "https://www.npmjs.com/package/@uopoc/node-red-processstack",
 	"scripts": {

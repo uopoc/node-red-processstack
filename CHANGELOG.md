@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+
+
+### Fixed
+
+
+
+### Changed
+
+
+
+### Removed
+
+
+
+
+## [1.0.30] - 2025-07-20
+
+### Added
+
 - Track history in each item
 - Changelog added
 - ui-Dasboard Widget with graphical display of queues

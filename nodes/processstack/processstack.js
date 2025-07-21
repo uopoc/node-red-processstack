@@ -1,13 +1,16 @@
 const { randomUUID } = require('crypto');
 const fs = require("fs");
+const path = require('path');
 
-const dir = "/data/pststacks";
+const system_struct_version = "1.0.0";
 module.exports = function(RED) {
 	
 	// ##########################################################
     // Push Node
 	// ##########################################################
 	function PushNode(config) {
+		
+		
         RED.nodes.createNode(this,config);
         var node = this;
         node.stack = RED.nodes.getNode(config.stack);
@@ -554,7 +557,8 @@ module.exports = function(RED) {
 		// ---------------------------------------
 		// File Access Methods
 		// ---------------------------------------
-		const stackFile = `${dir}/${node.manufacturingcell.processflow.processid}/${node.manufacturingcell.cellid}/${node.stackid}.json`;
+		const dir = path.join(RED.settings.userDir || '.', 'node-data/UOPOC/processstack/v'+system_struct_version+'/');
+		const stackFile = `${dir}/${node.manufacturingcell.processflow.processid}_${node.manufacturingcell.processflow.id}/${node.manufacturingcell.cellid}_${node.manufacturingcell.id}/${node.stackid}_${node.id}.json`;
 		if (!fs.existsSync(dir)) {fs.mkdirSync(dir, { recursive: true });}
 		
 		node.loadStack = async function() {

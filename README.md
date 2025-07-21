@@ -1,27 +1,25 @@
-# 🧱 Virtual Process Flow Stack for Node-RED
+# 🧱 Virtual Process Flow Queue for Node-RED
 ## Description
 
 Manage persistent FIFO queues for industrial process flows using Node-RED. \
 With full MQTT support, file persistence, and dashboard integration.
 
-** For pedagogical purposes only. Commercial or industrial use is not recommended. **
+> ** For pedagogical purposes only. Commercial or industrial use is not recommended. **
 
 * NPM Repository: [npmjs @uopoc/node-red-processstack](https://www.npmjs.com/package/@uopoc/node-red-processstack/)
 * GIT Repository: [github @uopoc/node-red-processstack](https://github.com/uopoc/node-red-processstack)
 * RED Node: [Node-Red @uopoc/node-red-processstack](https://flows.nodered.org/node/@uopoc/node-red-processstack)
 
-
-** WARNING ** : 
-* Minimum Node-RED Version 4.0.0+
-* Minimum NodeJS Version 18.0.0+
-* Minimum node-red-dashboard Version 3.6.0+
-
-
-
 Copyright © 2025, [Université d'Orléans](https://www.univ-orleans.fr)\
 Licensed under the MIT License – See [LICENCE](./LICENCE) file included with this package 
 
+---
 
+## ⚠️ Requirements
+
+- Node-RED `v4.0.0+`
+- Node.js `v18.0.0+`
+- `node-red-dashboard` `v3.6.0+`
 
 ## 🧰 Main Features
 - **Persistent FIFO** (First-In First-Out) queues (stacks)
@@ -35,25 +33,25 @@ Licensed under the MIT License – See [LICENCE](./LICENCE) file included with t
 
 | Node         | Description |
 |--------------|-------------|
-| `pst-push`       | Adds an item to the stack |
-| `pst-shift`      | Removes the first item from the stack |
-| `pst-transfert`  | Moves an item from a source stack to a target stack |
+| `pst-push`       | Adds an item to the queue |
+| `pst-shift`      | Removes the first item from the queue |
+| `pst-transfert`  | Moves an item from a source queue to a target queue |
 | `pst-peek` 	   | Same as shift but without removing item |
-| `pst-supervisor` | Returns the entire stack contents |
-| `pst-clearstack` | Empties the stack completely |
-| `ui-pst-table` | in Dashboard panel: display the content of the stack in the dashboard |
+| `pst-supervisor` | Returns the entire queue contents |
+| `pst-clearstack` | Empties the queue completely |
+| `ui-pst-table` | in Dashboard panel: display the content of the queue in the dashboard |
 
 ## 🛠️ Configuration Nodes
 
 | Node                  			| Description 						|
 |-----------------------------------|-----------------------------------|
-| `pst-stack` *(config)*              	| Defines a persistent FIFO stack 	|
+| `pst-stack` *(config)*              	| Defines a persistent FIFO queue 	|
 | `pst-manufacturingcell` *(config)* 	| Defines a production cell 		|
 | `pst-processflow` *(config)*       	| Defines a production line  		|
 
 
 ## 💾 Persistence
-Each stack is **automatically saved to disk** after every modification:\
+Each queue is **automatically saved to disk** after every modification:\
 /data/pststacks/<processid>/<cellid>/<stackid>.json
 
 ## Installation
@@ -67,7 +65,7 @@ npm install @uopoc/node-red-processstack
 
 ## Nodes details
 ### PUSH Node
-Add (push) an item to the FIFO Stack
+Add (push) an item to the FIFO queue
 * **Input**:
  Object with :
 	- id Required, string or number (max 128 chars). Allowed characters: a-z, A-Z, 0-9, _, -, 
@@ -106,57 +104,57 @@ Object with :
 	}
 
 ### SHIFT Node
-Remove (shift) an item from the FIFO Stack
+Remove (shift) an item from the FIFO queue
 * input: Dummy message to triger the node
 * output: (same as peek or msg.item provided by the output of push node)
 
 ### PEEK Node
-Get (whithout shift) an item from the FIFO Stack
+Get (whithout shift) an item from the FIFO queue
 * input: Dummy message to triger the node
 * output: (same as shift or msg.item provided by the output of push node)
 
 ### TRANSFERT Node
-Transfert (pull/push) an item from a stack to another
+Transfert (pull/push) an item from a queue to another
 
 ### CLEAR Node
-Delete all items from the FIFO Stack
+Delete all items from the FIFO queue
 
 ### SUPERVISOR Node
-Get items list from the FIFO Stack. \ 
-Check the autoupdate checkbox in the node property in order to update the status every stack change.\ 
-use the ui-pst-table or a ui-template node in order to display the stack in a dashboard.
+Get items list from the FIFO queue. \ 
+Check the autoupdate checkbox in the node property in order to update the status every queue change.\ 
+use the ui-pst-table or a ui-template node in order to display the queue in a dashboard.
 
 ### UI-PST-TABLE Node
-In Dashboard panel: display the content of the stack in the dashboard\ 
+In Dashboard panel: display the content of the queue in the dashboard\ 
 Should be connected to the second output of the supervisor node.\ 
 It can replace a ui-template node
 
 ## MQTT
-You can connect the stack config node to a mqttClient and provide 3 topics:
+You can connect the queue config node to a mqttClient and provide 3 topics:
 * **Command**: (not implemented) Input command (push, shift, clear, peek)
 * **Events**: Every event (push, shift, clear, etc.) will emit message
-* **Superv**: Emits complete stack state and profile after event
+* **Superv**: Emits complete queue state and profile after event
 
 
 ### Superv
-Please configure the topic and the mqtt client in the stack config Node
+Please configure the topic and the mqtt client in the queue config Node
 after each operation, a mqtt message is send to the specified topic: \
 **Content**:
 * path: (string) processid/stackid, 
 * profil: {...}, 
 * stack: [item1,...] 
-* count: Number of item in the stack 
-* length: Maximum number of item in the stack
+* count: Number of item in the queue 
+* length: Maximum number of item in the queue
 
 ### Events
-Please configure the topic and the mqtt client in the stack config Node\
+Please configure the topic and the mqtt client in the queue config Node\
 after each operation, a mqtt message is send to the specified topic: \
 **Content**: 
 * path: (string) processid/stackid,
 * event: (string) type of activity (push, shift, clear...)
 * item: (object) item
-* count: (number) Number of item in the stack
-* length: (number) Maximum number of item in the stack
+* count: (number) Number of item in the queue
+* length: (number) Maximum number of item in the queue
 
 ### Command
 Not Implemented Yet
